@@ -1,0 +1,58 @@
+import os
+import sys
+import shutil
+from string import Template
+
+# Set your custom scaffold template folder here:
+CUSTOM_TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'default_min')
+
+def replace_placeholders_in_file(file_path, placeholders):
+    """Replace placeholders like ${module_name} in text files."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        template = Template(content)
+        new_content = template.safe_substitute(placeholders)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+    except Exception as e:
+        print(f"Warning: Could not process {file_path}: {e}")
+
+def scaffold_module(module_name, target_dir):
+    module_path = os.path.join(target_dir, module_name)
+    if os.path.exists(module_path):
+        print(f"Error: Module '{module_name}' already exists at {module_path}.")
+        sys.exit(1)
+
+    if not os.path.isdir(CUSTOM_TEMPLATE_DIR):
+        print(f"Error: Custom template directory '{CUSTOM_TEMPLATE_DIR}' not found.")
+        sys.exit(1)
+
+    # Copy the template folder to the target location
+    shutil.copytree(CUSTOM_TEMPLATE_DIR, module_path)
+    print(f"Copied template to {module_path}")
+
+    # Replace placeholders in relevant text files
+    text_file_extensions = {'.py', '.xml', '.csv', '.txt', '.md', '.json'}
+
+    placeholders = {'module_name': module_name}
+
+    for root, _, files in os.walk(module_path):
+        for filename in files:
+            ext = os.path.splitext(filename)[1]
+            if ext.lower() in text_file_extensions:
+                file_path = os.path.join(root, filename)
+                replace_placeholders_in_file(file_path, placeholders)
+
+    print(f"Scaffold for module '{module_name}' created successfully at {module_path}.")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python ./scaffold <module_name> <target_path>")
+        sys.exit(1)
+
+    module_name = sys.argv[1]
+    target_dir = sys.argv[2]
+
+    scaffold_module(module_name, target_dir)
+
