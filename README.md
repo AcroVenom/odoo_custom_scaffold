@@ -27,7 +27,9 @@ How to use
 
 1. Git clone this inside your pycharm environment
 2. cd into the file
-3. use this command python ./scaffold custom_module_name custom_addons_path
+3. use this command 
+  3.1 python ./scaffold custom_module_name custom_addons_path //To have the default Odoo scaffolded folders
+  3.2 python ./scaffold_min custom_module_name custom_addons_path //To have the minimal scaffolders folders
 4. Done
 
 </pre>
